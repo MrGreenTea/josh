@@ -11,8 +11,10 @@ fn main() {
         stdin.read_line(&mut input).unwrap();
         let mut args = input.split_whitespace();
         let cmd = args.next().unwrap();
+        let args = &mut args.collect::<Vec<_>>();
         match cmd {
             "exit" => break,
+            "echo" => println!("{}", args.join(" ")),
             cmd => println!("{}: command not found", cmd.trim()),
         }
     }
