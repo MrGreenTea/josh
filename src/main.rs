@@ -36,7 +36,9 @@ fn main() {
             "type" => {
                 for arg in args {
                     match *arg {
-                        "pwd" | "exit" | "echo" | "type" => println!("{} is a shell builtin", arg),
+                        "pwd" | "exit" | "echo" | "type" | "cd" => {
+                            println!("{} is a shell builtin", arg)
+                        }
                         a => {
                             if let Some(path) = find_command_in_path(a) {
                                 println!("{} is {}", a, path);
@@ -48,6 +50,17 @@ fn main() {
                 }
             }
             "pwd" => println!("{}", std::env::current_dir().unwrap().display()),
+            "cd" => {
+                if args.len() > 1 {
+                    println!("cd: too many arguments");
+                } else if let Some(path) = args.first() {
+                    if std::env::set_current_dir(path).is_err() {
+                        println!("{}: No such file or directory", path);
+                    }
+                } else {
+                    std::env::set_current_dir(std::env::current_dir().unwrap()).unwrap();
+                }
+            }
             cmd => {
                 if let Some(path) = find_command_in_path(cmd) {
                     run_executable(&path, args);
