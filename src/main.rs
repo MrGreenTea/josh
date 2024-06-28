@@ -9,9 +9,11 @@ fn main() {
         io::stdout().flush().unwrap();
         let mut input = String::new();
         stdin.read_line(&mut input).unwrap();
-        match input.trim() {
+        let mut args = input.split_whitespace();
+        let cmd = args.next().unwrap();
+        match cmd {
             "exit" => break,
-            _ => println!("{}: command not found", input.trim()),
+            cmd => println!("{}: command not found", cmd.trim()),
         }
     }
 }
