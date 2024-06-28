@@ -19,7 +19,7 @@ fn main() {
                 for arg in args {
                     match *arg {
                         "exit" | "echo" | "type" => println!("{} is a shell builtin", arg),
-                        a => println!("{}: command not found", a),
+                        a => println!("{}: not found", a),
                     }
                 }
             }
