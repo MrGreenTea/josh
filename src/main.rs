@@ -32,7 +32,7 @@ fn main() {
                         "exit" | "echo" | "type" => println!("{} is a shell builtin", arg),
                         a => {
                             if let Some(path) = find_command_in_path(a) {
-                                println!("{}: {}", a, path);
+                                println!("{} is {}", a, path);
                             } else {
                                 println!("{}: not found", a);
                             }
