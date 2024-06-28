@@ -36,7 +36,7 @@ fn main() {
             "type" => {
                 for arg in args {
                     match *arg {
-                        "exit" | "echo" | "type" => println!("{} is a shell builtin", arg),
+                        "pwd" | "exit" | "echo" | "type" => println!("{} is a shell builtin", arg),
                         a => {
                             if let Some(path) = find_command_in_path(a) {
                                 println!("{} is {}", a, path);
@@ -47,6 +47,7 @@ fn main() {
                     }
                 }
             }
+            "pwd" => println!("{}", std::env::current_dir().unwrap().display()),
             cmd => {
                 if let Some(path) = find_command_in_path(cmd) {
                     run_executable(&path, args);
