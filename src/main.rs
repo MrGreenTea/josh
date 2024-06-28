@@ -12,6 +12,13 @@ fn find_command_in_path(cmd: &str) -> Option<String> {
     None
 }
 
+fn run_executable(cmd: &str, args: &[&str]) {
+    // print output to stdout
+    let mut child = std::process::Command::new(cmd).args(args).spawn().unwrap();
+
+    child.wait().unwrap();
+}
+
 fn main() {
     // Wait for user input
     let stdin = io::stdin();
@@ -40,7 +47,13 @@ fn main() {
                     }
                 }
             }
-            cmd => println!("{}: command not found", cmd.trim()),
+            cmd => {
+                if let Some(path) = find_command_in_path(cmd) {
+                    run_executable(&path, args);
+                } else {
+                    println!("{}: command not found", cmd)
+                }
+            }
         }
     }
 }
