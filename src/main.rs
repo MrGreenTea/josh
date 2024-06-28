@@ -15,6 +15,14 @@ fn main() {
         match cmd {
             "exit" => break,
             "echo" => println!("{}", args.join(" ")),
+            "type" => {
+                for arg in args {
+                    match *arg {
+                        "exit" | "echo" | "type" => println!("{} is a shell builtin", arg),
+                        a => println!("{}: command not found", a),
+                    }
+                }
+            }
             cmd => println!("{}: command not found", cmd.trim()),
         }
     }
