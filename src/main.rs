@@ -1,6 +1,4 @@
-#[allow(unused_imports)]
 use std::io::{self, Write};
-use std::path::Path;
 
 fn find_command_in_path(cmd: &str) -> Option<String> {
     let paths = std::env::var_os("PATH")?;
@@ -55,19 +53,15 @@ fn main() {
                 if args.len() > 1 {
                     println!("cd: too many arguments");
                 } else if let Some(path) = args.first() {
-                    let path = Path::new(path)
-                        .iter()
-                        .map(|x| match x.to_str().unwrap() {
-                            "~" => std::env::var("HOME").unwrap(),
-                            p => p.to_string(),
-                        })
-                        .collect::<Vec<_>>()
-                        .join("/");
+                    let path = match *path {
+                        "~" => std::env::var("HOME").unwrap(),
+                        p => p.to_string(),
+                    };
                     if std::env::set_current_dir(&path).is_err() {
                         println!("{}: No such file or directory", path);
                     }
                 } else {
-                    std::env::set_current_dir(std::env::current_dir().unwrap()).unwrap();
+                    std::env::set_current_dir(std::env::var("HOME").unwrap()).unwrap();
                 }
             }
             cmd => {
