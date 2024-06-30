@@ -11,11 +11,15 @@ fn find_command_in_path(cmd: &str) -> Option<String> {
     None
 }
 
-fn run_executable(cmd: &str, args: &[&str]) {
-    // print output to stdout
-    let mut child = std::process::Command::new(cmd).args(args).spawn().unwrap();
+fn interpolate_arg(arg: &str) -> String {
+    return arg.replace("~", &std::env::var("HOME").unwrap());
+}
 
-    child.wait().unwrap();
+fn run_executable(cmd: &str, args: &[String]) -> Result<std::process::ExitStatus, std::io::Error> {
+    // print output to stdout
+    let mut child = std::process::Command::new(cmd).args(args).spawn()?;
+
+    child.wait()
 }
 
 fn main() {
@@ -26,15 +30,15 @@ fn main() {
         io::stdout().flush().unwrap();
         let mut input = String::new();
         stdin.read_line(&mut input).unwrap();
-        let mut args = input.split_whitespace();
+        let mut args = input.split_whitespace().map(|a| interpolate_arg(a));
         let cmd = args.next().unwrap();
-        let args = &mut args.collect::<Vec<_>>();
-        match cmd {
+        let args: Vec<String> = args.collect();
+        match cmd.as_str() {
             "exit" => break,
             "echo" => println!("{}", args.join(" ")),
             "type" => {
                 for arg in args {
-                    match *arg {
+                    match arg.as_str() {
                         "pwd" | "exit" | "echo" | "type" | "cd" => {
                             println!("{} is a shell builtin", arg)
                         }
@@ -53,7 +57,7 @@ fn main() {
                 if args.len() > 1 {
                     println!("cd: too many arguments");
                 } else if let Some(path) = args.first() {
-                    let path = match *path {
+                    let path = match path.as_str() {
                         "~" => std::env::var("HOME").unwrap(),
                         p => p.to_string(),
                     };
@@ -66,7 +70,9 @@ fn main() {
             }
             cmd => {
                 if let Some(path) = find_command_in_path(cmd) {
-                    run_executable(&path, args);
+                    if let Err(result) = run_executable(&path, &args) {
+                        println!("{}", result);
+                    }
                 } else {
                     println!("{}: command not found", cmd)
                 }
